@@ -244,5 +244,5 @@ if __name__ == "__main__":
     sys.stdout.write("\x1b[8;{rows};{cols}t".format(rows=50, cols=80))
     print_header()
     sys.stdout.write('\033[s')
-    dataStream = read_csv_file("data2.csv")
+    dataStream = read_csv_file("data.csv")
     listen_to_usb_serial(dataStream)
