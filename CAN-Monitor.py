@@ -1,8 +1,11 @@
-import pandas as pd
-import re, sys
-import time
+import re
 import struct
+import sys
+import time
+
 import cursor
+import pandas as pd
+
 
 class Frame:
     def __init__(self, data):
@@ -21,9 +24,9 @@ class Frame:
         self.extract_hex_bytes()
         self.xPos = 0
         self.colour = ''
-        self.count = 1
-        self.count_per_second = 0
-        self.count_per_second_storage = [0]
+        self.count = 0
+        self.count_in_last_3_seconds = 0
+        self.count_per_total_seconds = 0
         self.count_per_second_in_last_3_seconds = 0
 
     def extract_hex_bytes(self):
@@ -74,21 +77,20 @@ class Frame:
 
     def increase_count(self):
         self.count += 1
+        self.count_in_last_3_seconds += 1
 
-    def calc_counts_per_second(self, oldFrame):
+    def calc_counts_per_total_seconds(self):
         global START_TIME
-        self.count = oldFrame.count
-        self.count_per_second = (self.count / (get_current_time() - START_TIME))
-        self.count_per_second_storage = oldFrame.count_per_second_storage
-        self.count_per_second_storage.append(self.count_per_second)
+        self.count_per_total_seconds = (self.count / (get_current_time() - START_TIME))
     
     def calc_count_per_second_in_last_3_seconds(self):
         global TEMP_TIME
-        if (round(get_current_time() - TEMP_TIME) == 3):
-            self.count_per_second_storage = []
+        timeWindow = get_current_time() - TEMP_TIME
+        if (timeWindow >= 3):
+            self.count_in_last_3_seconds = 0
             TEMP_TIME = get_current_time()
-        else:
-            self.count_per_second_in_last_3_seconds = (sum(self.count_per_second_storage) / len(self.count_per_second_storage))
+        elif ((round(timeWindow,1) % 1) == 0):
+            self.count_per_second_in_last_3_seconds = (self.count_in_last_3_seconds / timeWindow)
 
     def set_position(self, x):
         self.xPos = x
@@ -139,7 +141,7 @@ class Frame:
         sys.stdout.write('| \t')
         sys.stdout.write(str(self.count))
         sys.stdout.write('\t |\t')
-        sys.stdout.write(str(round(self.count_per_second,2)))
+        sys.stdout.write(str(round(self.count_per_total_seconds,2)))
         sys.stdout.write('\t |')
         sys.stdout.write('      \t')
         sys.stdout.write(str(round(self.count_per_second_in_last_3_seconds,2)))
@@ -210,12 +212,17 @@ def check_for_byte_changes(newFrame, oldFrame):
 def read_csv_file(filePath):
     return pd.read_csv(filePath)
 
+def update_data(newFrame, oldFrame, index):
+    oldFrame.set_position(index)
+    for val in filter(lambda a: a.startswith('hex') | a.startswith('frame'), dir(oldFrame)):
+        setattr(oldFrame,val,getattr(newFrame,val))
+
 def listen_to_usb_serial(dataStream):
     uniqueFrames = []
 
     for _, data in enumerate(dataStream.values):
         # Imitate delay
-        time.sleep(0.01)
+        time.sleep(0.005)
 
         # Create a new frame object
         newFrame = Frame(data)
@@ -227,12 +234,11 @@ def listen_to_usb_serial(dataStream):
             uniqueFrames = sort_list_by_id(uniqueFrames)
             clear_terminal_then_print(uniqueFrames)
         else: # If yes, overwrite frame in uniqueFrames
-            newFrame.set_position(index)
-            newFrame.calc_counts_per_second(uniqueFrames[index])
-            newFrame.calc_count_per_second_in_last_3_seconds()
-            newFrame.increase_count()
             differentBytes = check_for_byte_changes(newFrame, uniqueFrames[index])
-            uniqueFrames[index] = newFrame
+            update_data(newFrame, uniqueFrames[index], index)
+            uniqueFrames[index].increase_count()
+            uniqueFrames[index].calc_counts_per_total_seconds()
+            uniqueFrames[index].calc_count_per_second_in_last_3_seconds()
             move_to_line_in_terminal_then_print(uniqueFrames[index], differentBytes)
 
 

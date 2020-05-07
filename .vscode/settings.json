@@ -1,4 +1,5 @@
 {
     "python.pythonPath": "/Users/samueldelamotte/opt/miniconda3/envs/CAN-Monitor/bin/python",
+    "python.analysis.disabled": ["used-before-assignment"],
     "git.autofetch": true
 }
