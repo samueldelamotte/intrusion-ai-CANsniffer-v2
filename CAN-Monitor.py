@@ -83,9 +83,9 @@ class Frame:
         global START_TIME
         self.count_per_total_seconds = (self.count / (get_current_time() - START_TIME))
     
-    def calc_count_per_second_in_last_3_seconds(self):
+    def calc_count_per_second_in_last_3_seconds(self, tempTime):
         global TEMP_TIME
-        timeWindow = get_current_time() - TEMP_TIME
+        timeWindow = get_current_time() - tempTime
         if (timeWindow >= 3):
             self.count_in_last_3_seconds = 0
             TEMP_TIME = get_current_time()
@@ -238,7 +238,7 @@ def listen_to_usb_serial(dataStream):
             update_data(newFrame, uniqueFrames[index], index)
             uniqueFrames[index].increase_count()
             uniqueFrames[index].calc_counts_per_total_seconds()
-            uniqueFrames[index].calc_count_per_second_in_last_3_seconds()
+            uniqueFrames[index].calc_count_per_second_in_last_3_seconds(TEMP_TIME)
             move_to_line_in_terminal_then_print(uniqueFrames[index], differentBytes)
 
 
