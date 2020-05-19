@@ -218,7 +218,7 @@ def log_frame_to_file(logFilename, decodedBytes=None, firstRowHeaders=None):
     if (decodedBytes != None):
         with open(r'{0}'.format(logFilename), 'a') as f:
             writer = csv.writer(f)
-            writer.writerow(decodedBytes)
+            writer.writerow(decodedBytes + [str(get_current_time())])
             f.close()
     elif (firstRowHeaders != None):
         with open(r'{0}'.format(logFilename), 'a') as f:
