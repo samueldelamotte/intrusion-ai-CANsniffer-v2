@@ -42,7 +42,7 @@ _**NOTE (2):** The Arduino library used for this setup should work with any Ardu
 
 1. Download and install the Arduino IDE from the link above.
 2. Install Seeedstudio's Arduino library given in the link above. Instructions on how to install additional Arduino libraries can be found here (<https://www.arduino.cc/en/guide/libraries>). See the section "Importing a .zip library". *Note: If you run into any issues in the next few steps, here is a helpful link (<https://www.arduino.cc/en/guide/troubleshooting>)*
-3. Found in the "CAN-Reader" directory of this GitHub is the script that we will now flash to our Arduino Uno. Download the .zip of this entire GitHub and extract the files to your preffered location. Now open the "CAN-Logger.ino" script in the Arduino IDE.
+3. Found in the "CAN-Reader" directory of this GitHub is the script that we will now flash to our Arduino Uno. Download the .zip of this entire GitHub and extract the files to your preffered location. Now open the "CAN-Reader.ino" script in the Arduino IDE.
 4. At the top of the script is a "#define" macro for the CAN_BITRATE. You will need to research what bitrate your car's CAN bus uses. I believe in most cases it should be 500 Kbps. *Possible values you can set this to are; 500, 250 or 125. Also note that our USB serial Baud Rate is set to 115200, you won't need to change this.*
 5. Connect your Arduino Uno to your computer's USB port using the Type A -> Type B USB cable, the Arduino IDE should recognise your device upon doing this. To check, go to Tools -> Port -> Select Port. Ensure that it also states "Board: Arduino Uno".
 
