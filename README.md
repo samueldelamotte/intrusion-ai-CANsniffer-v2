@@ -1,6 +1,6 @@
 # intrusion-ai-CANsniffer
 
-![Demo](https://github.com/samueldelamotte/intrusion-ai-CANsniffer/blob/master/GitHub%20Images/demo.gif)
+![Demo](https://github.com/samueldelamotte/intrusion-ai-CANsniffer-v2/blob/master/GitHub%20Images/demo.gif)
 
 _**NOTE (1):** As the Sparkfun CAN-BUS Shield does not come with pre-soldered pin headers, you must solder these to the board yourself. Thus, you will need a soldering iron and solder to do this._
 
@@ -32,15 +32,15 @@ _**NOTE (2):** The Arduino library used for this setup should work with any Ardu
 
 1. Solder pin headers to your Sparkfun CAN-BUS shield.
 
-![Solder](https://github.com/samueldelamotte/intrusion-ai-CANsniffer/blob/master/GitHub%20Images/3.jpg)
+![Solder](https://github.com/samueldelamotte/intrusion-ai-CANsniffer-v2/blob/master/GitHub%20Images/3.jpg)
 
 2. The shield should now slot in perfectly to your Arduino Uno's pins.
 
-![Fit On Arduino](https://github.com/samueldelamotte/intrusion-ai-CANsniffer/blob/master/GitHub%20Images/4.jpg)
+![Fit On Arduino](https://github.com/samueldelamotte/intrusion-ai-CANsniffer-v2/blob/master/GitHub%20Images/4.jpg)
 
 3. Slot in your micro SD card on the shield. You should hear a springy click when it is correctly in. For your reference, the joystick next to the SD card slot is used in the Arduino code to begin data logging.
 
-![SD](https://github.com/samueldelamotte/intrusion-ai-CANsniffer/blob/master/GitHub%20Images/5.jpg)
+![SD](https://github.com/samueldelamotte/intrusion-ai-CANsniffer-v2/blob/master/GitHub%20Images/5.jpg)
 
 4. Locate your car's OBD2 port, it should be somewhere near the driver or the passenger dash (**Depends on the manufacturer**). Using the DB9 -> OBD2 cable, connect your Arduino setup to the OBD2 port. After following the instructions in the "1.2 - Software" section just below, you are ready to collect CAN bus data.
 
@@ -52,12 +52,12 @@ _**NOTE (2):** The Arduino library used for this setup should work with any Ardu
 4. At the top of the script is a "#define" macro for the CAN_BITRATE. You will need to research what bitrate your car's CAN bus uses. I believe in most cases it should be 500 Kbps. *Possible values you can set this to are; 500, 250 or 125. Also note that our USB serial Baud Rate is set to 115200, you won't need to change this.*
 5. Connect your Arduino Uno to your computer's USB port using the Type A -> Type B USB cable, the Arduino IDE should recognise your device upon doing this. To check, go to Tools -> Port -> Select Port. Ensure that it also states "Board: Arduino Uno".
 
-![Arduino COM Port](https://github.com/samueldelamotte/intrusion-ai-CANsniffer/blob/master/GitHub%20Images/1.PNG)
+![Arduino COM Port](https://github.com/samueldelamotte/intrusion-ai-CANsniffer-v2/blob/master/GitHub%20Images/1.PNG)
 
 6. Finally, in the top left of the Arduino IDE, click "upload" and the code will be flashed to your Arduino Uno.
 7. To check if the flash worked correctly open the Serial monitor in the Arduino IDE (found in Tools) and ensure your Serial monitor's Baud Rate is set to 115200. The output to your serial monitor should look the same as the image below. Sometimes pressing the reset switch on the Arduino Uno's board or re-opening the tool can fix serial monitor output issues.
 
-![Serial Monitor](https://github.com/samueldelamotte/intrusion-ai-CANsniffer/blob/master/GitHub%20Images/2.PNG)
+![Serial Monitor](https://github.com/samueldelamotte/intrusion-ai-CANsniffer-v2/blob/master/GitHub%20Images/2.PNG)
 
 8. To bein logging data, simply click the joystick on the Sparkfun CAN-BUS Shield. The Arduino script will begin reading and storing all CAN bus traffic after a 3 second countdown. To stop logging data, simply click the joystick again. *Note that the data will be stored on the micro SD card as a simple text file named "data.txt". Every new CAN signal is appended to the file, if you want to keep data from a specific driving period, then make sure you copy the data.txt file to your computer, so trip data doesn't get mixed.*.
 9. When the Arduino is connected to your car's OBD2 port via the DB9 -> OBD2 cable, I recommend also connecting the Arduino Uno to your laptop to verify that the CAN_BITRATE was set correctly and everything initialised correctly, and that the CAN bus data can be read. The Arduino IDE serial monitor will output, line by line, each CAN bus signal read.
