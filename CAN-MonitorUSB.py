@@ -246,6 +246,7 @@ def listen_to_usb_serial(logFilename, serialPort):
         # Decode what was read
         decodedBytes = list(serialBytes[0:len(serialBytes)-2].decode("utf-8").split(","))
 
+        # Filter out anything printed to the serial that is just a Serial.println from the arduino
         if (len(decodedBytes) > 1):
             # Log data
             log_frame_to_file(logFilename, decodedBytes)
@@ -273,7 +274,7 @@ def listen_to_usb_serial(logFilename, serialPort):
 
 if __name__ == "__main__":
     # Defines the serial port to listen on
-    ser = serial.Serial('/dev/cu.usbmodem14301', 115200)
+    ser = serial.Serial('/dev/cu.usbmodem14301', 115200) # Serial port connection and baud rate
 
     # Sets the name of the logfile, creates it and inserts the headers
     logFilename = 'log-{0}.csv'.format(datetime.now().strftime("(%d-%m-%Y)-(%H:%M:%S)"))
