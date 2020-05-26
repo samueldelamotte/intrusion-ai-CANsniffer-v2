@@ -277,7 +277,7 @@ if __name__ == "__main__":
     ser = serial.Serial('/dev/cu.usbmodem14301', 115200) # Serial port connection and baud rate
 
     # Sets the name of the logfile, creates it and inserts the headers
-    logFilename = 'log-{0}.csv'.format(datetime.now().strftime("(%d-%m-%Y)-(%H:%M:%S)"))
+    logFilename = 'log-{0}.csv'.format(datetime.now().strftime("(%d-%m-%Y_%H-%M-%S)")) # FORMAT => log-(Day-Month-Year_Hour-Minutes-Seconds).csv
     firstRowHeaders = ['id_dec','length','byte1','byte2','byte3','byte4','byte5','byte6','byte7','byte8','time_stamp']
     log_frame_to_file(logFilename, firstRowHeaders=firstRowHeaders)
 
