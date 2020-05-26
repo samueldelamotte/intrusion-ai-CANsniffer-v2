@@ -249,5 +249,5 @@ if __name__ == "__main__":
     sys.stdout.write("\x1b[8;{rows};{cols}t".format(rows=50, cols=80))
     print_header()
     sys.stdout.write('\033[s')
-    dataStream = read_csv_file("log-(19-05-2020)-(17:45:30).csv")
+    dataStream = read_csv_file("log-(19-05-2020_17-45-30).csv")
     listen_to_usb_serial(dataStream)
