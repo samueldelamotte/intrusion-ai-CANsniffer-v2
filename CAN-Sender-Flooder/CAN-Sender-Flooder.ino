@@ -29,9 +29,10 @@ https://www.instructables.com/id/Hack-your-vehicle-CAN-BUS-with-Arduino-and-Seee
 
 //************************CAN MESSAGE CONFIGURATION*************************//
 // CAN message ID (in HEX), payload and length
-unsigned long ID = 0x545;  // 1349
+unsigned long ID = 0x2;  // 1349
 unsigned long LENGTH = 8;
-unsigned char PAYLOAD[8] = {0, 1, 2, 3, 4, 5, 6, 7};
+unsigned char PAYLOAD[8] = {3, 2, 1, 4, 2, 1, 4, 8};
+unsigned char PAYLOAD2[8] = {0xDA, 0, 0, 0x78, 0, 0, 0, 0};
 
 //*******************************CONSTANTS**********************************//
 // Initialise chip select pins
@@ -119,6 +120,8 @@ START:
     
     // Send CAN message
     CAN.sendMsgBuf(ID,0,LENGTH,PAYLOAD); // 0 means standard frame length, 1 is extended
+    //CAN.sendMsgBuf(0x545,0,8,PAYLOAD2); // 0 means standard frame length, 1 is extended
+    //delay(300);
     
     // Turn off LED3
     digitalWrite(LED3, LOW);
