@@ -2,6 +2,7 @@ import re
 import struct
 import sys
 import time
+import cantools
 
 import cursor
 import pandas as pd
@@ -216,15 +217,35 @@ def update_data(newFrame, oldFrame, index):
     for val in filter(lambda a: a.startswith('hex') | a.startswith('frame'), dir(oldFrame)):
         setattr(oldFrame,val,getattr(newFrame,val))
 
-def listen_to_usb_serial(dataStream):
+def write_decoded_mesage_to_file(db, frame):
+    hexPayload = ''
+    for byte in frame.hex_data:
+        hexPayload += byte
+    hexPayloadBytes = bytearray.fromhex(hexPayload)
+    try:
+        decodedFrame = db.decode_message(frame.id_dec, hexPayloadBytes)
+        stringToWrite = str(decodedFrame) + '\n'
+        f = open("dump.txt", "a")
+        f.write(stringToWrite)
+        f.close
+    except:
+        pass
+
+def listen_to_usb_serial(dataStream, dbcPath):
+    db = cantools.database.load_file(dbcPath)
     uniqueFrames = []
 
     for _, data in enumerate(dataStream.values):
         # Imitate delay
-        time.sleep(0.0005)
+        # time.sleep(0.0005)
 
         # Create a new frame object
         newFrame = Frame(data)
+        write_decoded_mesage_to_file(db, newFrame)
+        
+
+        # Write decoded message to file
+
 
         # Check if we have seen this frame before
         index = get_index_in_list(uniqueFrames, newFrame.id_dec)
@@ -249,5 +270,5 @@ if __name__ == "__main__":
     sys.stdout.write("\x1b[8;{rows};{cols}t".format(rows=50, cols=80))
     print_header()
     sys.stdout.write('\033[s')
-    dataStream = read_csv_file("log-(31-07-2020_12-55-39).csv")
-    listen_to_usb_serial(dataStream)
+    dataStream = read_csv_file("Dataset/Passive Driving/log-(16-07-2020_11-29-59).csv")
+    listen_to_usb_serial(dataStream, 'Dbc/hyundai_i30_2014.dbc')
