@@ -3,7 +3,6 @@ import struct
 import sys
 import time
 import cantools
-
 import cursor
 import pandas as pd
 
