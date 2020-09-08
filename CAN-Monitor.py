@@ -6,6 +6,28 @@ import cantools
 import cursor
 import pandas as pd
 
+MESSAGE_LIST = [
+    "LAT_ACCEL",
+    "LONG_ACCEL",
+    "PID_03h",
+    "PID_04h",
+    "PID_05h",
+    "PID_06h",
+    "PID_07h",
+    "PID_08h",
+    "PID_09h",
+    "PID_0Bh",
+    "PID_0Ch",
+    "PID_0Dh",
+    "PID_11h",
+    "PID_12h",
+    "TEMP_ENG",
+    "VS",
+    "WHEEL_FL",
+    "WHEEL_FR",
+    "WHEEL_RL",
+    "WHEEL_RR"
+]
 
 class Frame:
     def __init__(self, data):
@@ -223,8 +245,14 @@ def write_decoded_mesage_to_file(db, frame):
     hexPayloadBytes = bytearray.fromhex(hexPayload)
     try:
         decodedFrame = db.decode_message(frame.id_dec, hexPayloadBytes)
+        for key, value in decodedFrame.items():
+            if (key in MESSAGE_LIST):
+                stringToWrite = key + "," + str(value) + "\n"
+                m = open("filtered_messages_dump.txt", "a")
+                m.write(stringToWrite)
+                m.close
         stringToWrite = str(decodedFrame) + '\n'
-        f = open("dump.txt", "a")
+        f = open("messages_dump.txt", "a")
         f.write(stringToWrite)
         f.close
     except:
@@ -240,11 +268,9 @@ def listen_to_usb_serial(dataStream, dbcPath):
 
         # Create a new frame object
         newFrame = Frame(data)
-        write_decoded_mesage_to_file(db, newFrame)
-        
 
         # Write decoded message to file
-
+        write_decoded_mesage_to_file(db, newFrame)
 
         # Check if we have seen this frame before
         index = get_index_in_list(uniqueFrames, newFrame.id_dec)

@@ -1,5 +1,5 @@
 {
-    "python.pythonPath": "/Users/samueldelamotte/opt/miniconda3/envs/CAN-Monitor/bin/python",
+    "python.pythonPath": "/usr/bin/python3",
     "python.analysis.disabled": ["pylint(used-before-assignment)"],
     "git.autofetch": true
 }
