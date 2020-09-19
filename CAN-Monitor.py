@@ -270,22 +270,22 @@ def listen_to_usb_serial(dataStream, dbcPath):
         # Create a new frame object
         newFrame = Frame(data)
 
-        # Write decoded message to file
-        write_decoded_mesage_to_file(db, newFrame)
+        # # Write decoded message to file
+        # write_decoded_mesage_to_file(db, newFrame)
 
-        # # Check if we have seen this frame before
-        # index = get_index_in_list(uniqueFrames, newFrame.id_dec)
-        # if (index == -1): # If no, append to uniqueFrames, sort then print
-        #     uniqueFrames.append(newFrame)
-        #     uniqueFrames = sort_list_by_id(uniqueFrames)
-        #     clear_terminal_then_print(uniqueFrames)
-        # else: # If yes, overwrite frame in uniqueFrames
-        #     differentBytes = check_for_byte_changes(newFrame, uniqueFrames[index])
-        #     update_data(newFrame, uniqueFrames[index], index)
-        #     uniqueFrames[index].increase_count()
-        #     uniqueFrames[index].calc_counts_per_total_seconds()
-        #     uniqueFrames[index].calc_count_per_second_in_last_3_seconds(TEMP_TIME)
-        #     move_to_line_in_terminal_then_print(uniqueFrames[index], differentBytes)
+        # Check if we have seen this frame before
+        index = get_index_in_list(uniqueFrames, newFrame.id_dec)
+        if (index == -1): # If no, append to uniqueFrames, sort then print
+            uniqueFrames.append(newFrame)
+            uniqueFrames = sort_list_by_id(uniqueFrames)
+            clear_terminal_then_print(uniqueFrames)
+        else: # If yes, overwrite frame in uniqueFrames
+            differentBytes = check_for_byte_changes(newFrame, uniqueFrames[index])
+            update_data(newFrame, uniqueFrames[index], index)
+            uniqueFrames[index].increase_count()
+            uniqueFrames[index].calc_counts_per_total_seconds()
+            uniqueFrames[index].calc_count_per_second_in_last_3_seconds(TEMP_TIME)
+            move_to_line_in_terminal_then_print(uniqueFrames[index], differentBytes)
 
 
 if __name__ == "__main__":
@@ -296,5 +296,5 @@ if __name__ == "__main__":
     sys.stdout.write("\x1b[8;{rows};{cols}t".format(rows=50, cols=80))
     print_header()
     sys.stdout.write('\033[s')
-    dataStream = read_csv_file("Dataset/Aggressive Driving/log-(23-08-2020_12-59-01).csv")
+    dataStream = read_csv_file("Dataset/Aggressive/log-(23-08-2020_12-59-01).csv")
     listen_to_usb_serial(dataStream, 'Dbc/hyundai_i30_2014.dbc')
