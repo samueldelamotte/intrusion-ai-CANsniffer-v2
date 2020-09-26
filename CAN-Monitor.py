@@ -272,8 +272,17 @@ def listen_to_usb_serial(logFilename, serialPort):
         
 
 if __name__ == "__main__":
+    # Quit program if no serial port string is provided as a command line argument
+    if (len(sys.argv) != 2):
+        print("Please provide the serial port to listen on. Example string is '/dev/tty.usbmodem1234'.")
+        quit()
+
     # Defines the serial port to listen on
-    ser = serial.Serial('/dev/tty.usbmodem14201', 115200) # Serial port connection and baud rate
+    try:
+        ser = serial.Serial(sys.argv[1], 115200) # Serial port connection and baud rate
+    except:
+        print("Could not open USB serial port '{0}'".format(sys.argv[1]))
+        quit()
 
     # Sets the name of the logfile, creates it and inserts the headers
     logFilename = 'log-{0}.csv'.format(datetime.now().strftime("(%d-%m-%Y_%H-%M-%S)")) # FORMAT => log-(Day-Month-Year_Hour-Minutes-Seconds).csv
