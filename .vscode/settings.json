@@ -1,5 +1,5 @@
 {
-    "python.pythonPath": "/home/sam/anaconda3/bin/python",
+    "python.pythonPath": "/home/sam/anaconda3/envs/CAN-Monitor/bin/python",
     "python.analysis.disabled": ["pylint(used-before-assignment)"],
     "git.autofetch": true
 }

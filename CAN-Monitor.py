@@ -5,7 +5,6 @@ import serial
 import struct
 import sys
 import time
-
 import cursor
 import pandas as pd
 
