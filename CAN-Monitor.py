@@ -1,40 +1,21 @@
+import csv
+from datetime import datetime
 import re
+import serial
 import struct
 import sys
 import time
-import cantools
+
 import cursor
 import pandas as pd
 
-MESSAGE_LIST = [
-    "LAT_ACCEL",
-    "LONG_ACCEL",
-    "PID_03h",
-    "PID_04h",
-    "PID_05h",
-    "PID_06h",
-    "PID_07h",
-    "PID_08h",
-    "PID_09h",
-    "PID_0Bh",
-    "PID_0Ch",
-    "PID_0Dh",
-    "PID_11h",
-    "PID_12h",
-    "TEMP_ENG",
-    "VS",
-    "WHEEL_FL",
-    "WHEEL_FR",
-    "WHEEL_RL",
-    "WHEEL_RR"
-]
 
 class Frame:
     def __init__(self, data):
         self.frame = data
         self.id_dec = int(self.frame[0])
         self.len = int(self.frame[1])
-        self.hex_data = self.frame[2:(self.len+2)]
+        self.hex_data = self.frame[2:self.len+2]
         self.hex_byte_1 = '  '
         self.hex_byte_2 = '  '
         self.hex_byte_3 = '  '
@@ -50,9 +31,8 @@ class Frame:
         self.count_in_last_3_seconds = 0
         self.count_per_total_seconds = 0
         self.count_per_second_in_last_3_seconds = 0
-        self.time_stamp = self.frame[-1]
 
-    def extract_hex_bytes(self): 
+    def extract_hex_bytes(self):
         if (len(self.hex_data) == 1):
             self.hex_byte_1 = self.hex_data[0]
         elif (len(self.hex_data) == 2):
@@ -234,67 +214,82 @@ def check_for_byte_changes(newFrame, oldFrame):
 def read_csv_file(filePath):
     return pd.read_csv(filePath)
 
+def log_frame_to_file(logFilename, decodedBytes=None, firstRowHeaders=None):
+    if (decodedBytes != None):
+        with open(r'{0}'.format(logFilename), 'a') as f:
+            writer = csv.writer(f)
+            writer.writerow(decodedBytes + [str(get_current_time())])
+            f.close()
+    elif (firstRowHeaders != None):
+        with open(r'{0}'.format(logFilename), 'a') as f:
+            writer = csv.writer(f)
+            writer.writerow(firstRowHeaders)
+            f.close()
+
 def update_data(newFrame, oldFrame, index):
     oldFrame.set_position(index)
     for val in filter(lambda a: a.startswith('hex') | a.startswith('frame'), dir(oldFrame)):
         setattr(oldFrame,val,getattr(newFrame,val))
 
-def write_decoded_mesage_to_file(db, frame):
-    hexPayload = ''
-    for byte in frame.hex_data:
-        hexPayload += byte
-    hexPayloadBytes = bytearray.fromhex(hexPayload)
-    try:
-        decodedFrame = db.decode_message(frame.id_dec, hexPayloadBytes)
-        for key, value in decodedFrame.items():
-            if (key in MESSAGE_LIST):
-                stringToWrite = key + "," + str(value) + "," + str(frame.time_stamp) + "\n"
-                m = open("Decodings/Aggressive/log-(23-08-2020_12-59-01)/{0}.csv".format(key), "a")
-                m.write(stringToWrite)
-                m.close
-        # stringToWrite = str(decodedFrame) + '\n'
-        # f = open("messages_dump.txt", "a")
-        # f.write(stringToWrite)
-        # f.close
-    except:
-        pass
+def listen_to_usb_serial(logFilename, serialPort):
+    # Setting up the USB serial
+    serialPort.flushInput()
 
-def listen_to_usb_serial(dataStream, dbcPath):
-    db = cantools.database.load_file(dbcPath)
+    # Store every unique frame we encounter
     uniqueFrames = []
 
-    for _, data in enumerate(dataStream.values):
-        # Imitate delay
-        # time.sleep(0.0005)
+    # Keep listening to USB traffic
+    while True:
+        # Read from USB serial
+        serialBytes = serialPort.readline()
 
-        # Create a new frame object
-        newFrame = Frame(data)
+        # Decode what was read
+        decodedBytes = list(serialBytes[0:len(serialBytes)-2].decode("utf-8").split(","))
 
-        # # Write decoded message to file
-        # write_decoded_mesage_to_file(db, newFrame)
+        # Filter out anything printed to the serial that is just a Serial.println from the arduino
+        if (len(decodedBytes) > 1):
+            # Log data
+            log_frame_to_file(logFilename, decodedBytes)
 
-        # Check if we have seen this frame before
-        index = get_index_in_list(uniqueFrames, newFrame.id_dec)
-        if (index == -1): # If no, append to uniqueFrames, sort then print
-            uniqueFrames.append(newFrame)
-            uniqueFrames = sort_list_by_id(uniqueFrames)
-            clear_terminal_then_print(uniqueFrames)
-        else: # If yes, overwrite frame in uniqueFrames
-            differentBytes = check_for_byte_changes(newFrame, uniqueFrames[index])
-            update_data(newFrame, uniqueFrames[index], index)
-            uniqueFrames[index].increase_count()
-            uniqueFrames[index].calc_counts_per_total_seconds()
-            uniqueFrames[index].calc_count_per_second_in_last_3_seconds(TEMP_TIME)
-            move_to_line_in_terminal_then_print(uniqueFrames[index], differentBytes)
+            # Create a new frame object
+            newFrame = Frame(decodedBytes)
 
+            # Check if we have seen this frame before
+            index = get_index_in_list(uniqueFrames, newFrame.id_dec)
+
+            # If no, append to uniqueFrames, sort then print
+            if (index == -1):
+                uniqueFrames.append(newFrame)
+                uniqueFrames = sort_list_by_id(uniqueFrames)
+                clear_terminal_then_print(uniqueFrames)
+            # If yes, overwrite frame in uniqueFrames
+            else:
+                differentBytes = check_for_byte_changes(newFrame, uniqueFrames[index])
+                update_data(newFrame, uniqueFrames[index], index)
+                uniqueFrames[index].increase_count()
+                uniqueFrames[index].calc_counts_per_total_seconds()
+                uniqueFrames[index].calc_count_per_second_in_last_3_seconds(TEMP_TIME)
+                move_to_line_in_terminal_then_print(uniqueFrames[index], differentBytes)
+        
 
 if __name__ == "__main__":
+    # Defines the serial port to listen on
+    ser = serial.Serial('/dev/tty.usbmodem14201', 115200) # Serial port connection and baud rate
+
+    # Sets the name of the logfile, creates it and inserts the headers
+    logFilename = 'log-{0}.csv'.format(datetime.now().strftime("(%d-%m-%Y_%H-%M-%S)")) # FORMAT => log-(Day-Month-Year_Hour-Minutes-Seconds).csv
+    firstRowHeaders = ['id_dec','length','byte1','byte2','byte3','byte4','byte5','byte6','byte7','byte8','time_stamp']
+    log_frame_to_file(logFilename, firstRowHeaders=firstRowHeaders)
+
     # Start time for collecting data
     START_TIME = get_current_time()
     TEMP_TIME = get_current_time()
+
+    # Setting up the terminal
     cursor.hide()
     sys.stdout.write("\x1b[8;{rows};{cols}t".format(rows=50, cols=80))
     print_header()
     sys.stdout.write('\033[s')
-    dataStream = read_csv_file("Dataset/Aggressive/log-(23-08-2020_12-59-01).csv")
-    listen_to_usb_serial(dataStream, 'Dbc/hyundai_i30_2014.dbc')
+
+    # Start logging CAN bus data
+    listen_to_usb_serial(logFilename, ser)
