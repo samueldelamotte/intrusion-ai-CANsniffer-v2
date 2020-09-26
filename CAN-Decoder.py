@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import cantools
+import sys
 from os import listdir
 from os.path import isfile, isdir, join, splitext
 from pathlib import Path
@@ -30,8 +31,19 @@ def write_decoded_mesage_to_file(db, frame, drivingStyle, logName):
         pass
 
 if __name__ == "__main__":
-    # Load DBC database file
-    db = cantools.database.load_file('Dbc/hyundai_i30_2014.dbc')
+    # Quit program if no serial port string is provided as a command line argument
+    if (len(sys.argv) != 2):
+        print("Please provide the path to the .dbc file. Example string is 'Dbc/hyundai_i30_2014.dbc'.")
+        quit()
+
+    # Load the database .dbc file
+    try:
+        db = cantools.database.load_file(sys.argv[1])
+    except:
+        print("Could not load .dbc file at '{0}'".format(sys.argv[1]))
+        quit()
+
+    # Sets the matplotlib plot styles
     plt.style.use('seaborn-whitegrid')
 
     # Decode aggressive driving dataset
