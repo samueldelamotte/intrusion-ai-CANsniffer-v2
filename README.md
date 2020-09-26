@@ -151,10 +151,11 @@ After completetion of part 1 and part 2 above, you can now read, analyse and col
 3. Using terminal (ensure your conda "CAN-Monitor" environment is active),
 
   ```terminal
-    python CAN-Decoder.py "Dbc/hyundai_i30_2014.dbc" "Dataset/Aggressive/log-(23-08-2020_12-59-01).csv"
+    python CAN-Decoder.py "Dbc/hyundai_i30_2014.dbc"
   ```
 
 - **NOTE:** The first argument to the python script is the location of the .dbc for your car data.
-- **NOTE:** The second argument to the python script is the location of the .csv logfile for your collected CAN bus data.
+- **NOTE:** This python script will decoded the entirety of your dataset, thus if you require decoding specific log files one-at-a-time, then you will need to alter the code.
 
 4. The decoded messages will be saved to the "~/intrusion-ai-CANsniffer-v2/Decodings/{Aggresive or Passive}/{log file name}.csv".
+5. Decoded message Vs. time line plots will be constructed for each message and will be placed in the "~/intrusion-ai-CANsniffer-v2/Plots" directory.
