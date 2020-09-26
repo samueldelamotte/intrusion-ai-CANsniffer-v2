@@ -107,18 +107,18 @@ This tool is an improvement on the previous python tool used in (https://github.
     conda activate CAN-Monitor
   ```
 
-5. To launch the python script you will need to know the name of the USB port connection and your code will look like something along the lines of;
+5. To launch the python script you will need to know the name of the USB port connection and your code will look like something along the lines of either of the following snippets;
 
   ```terminal
     python CAN-Monitor.py /dev/tty.usbmodem1234
   ```
-  - or maybe this,
+
   ```terminal
     python CAN-Monitor.py /dev/tty.usbbluetooth1234
   ```
 
-  - **NOTE:** You can type 'ls /dev/tty*' into a terminal window and you'll be able to see all the open serial port connections.
-  - **NOTE:** Additionally, the Arduino IDE will be able to also tell you the USB port name.
+- **NOTE:** You can type 'ls /dev/tty*' into a terminal window and you'll be able to see all the open serial port connections.
+- **NOTE:** Additionally, the Arduino IDE will be able to also tell you the USB port name.
 
 6. Hopefully the tool will load up and it will be ready to read and display CAN bus data that is read in by the Arduino setup, where it is then sent to your computers USB serial port and then displayed in a way that helps you analyse the data easier. As long as the tool is reading in the CAN bus data, it will also save each message in a .csv file within the same directory.
 
@@ -147,7 +147,11 @@ After completetion of part 1 and part 2 above, you can now read, analyse and col
 #### 4.2 - Usage
 
 1. Download your car's appropriate .dbc file (you NEED this to decode the CAN bus data without having to reverse engineer the payloads).
-2. Organise your Dataset directory so that it is structured properly i.e. passive logs are kept in the "~/intrusion-ai-CANsniffer-v2/Dataset/Passive" sub-directory and aggressive logs are kept in the "~/intrusion-ai-CANsniffer-v2/Dataset/Aggressive".
+2. Organise your Dataset directory so that it is structured properly:
+
+- Passive logs are kept in the "~/intrusion-ai-CANsniffer-v2/Dataset/Passive" sub-directory
+- Aggressive logs are kept in the "~/intrusion-ai-CANsniffer-v2/Dataset/Aggressive" sub-directory
+
 3. Using terminal (ensure your conda "CAN-Monitor" environment is active),
 
   ```terminal
