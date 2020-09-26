@@ -37,8 +37,8 @@ _**NOTE (2):** The Arduino library used for this setup should work with any Ardu
 
 2. On **ONE** of the Sparkfun CAN-BUS shields, solder a single 1000 Ohm resistor (on the underneath) to its CAN-H and CAN-L pins.
 
-![Resistor1](https://github.com/samueldelamotte/intrusion-ai-CANsniffer-v2/blob/master/GitHub%20Images/resistor-1.jpg)
-![Resistor2](https://github.com/samueldelamotte/intrusion-ai-CANsniffer-v2/blob/master/GitHub%20Images/resistor-2.jpg)
+![Resistor1](https://github.com/samueldelamotte/intrusion-ai-CANsniffer-v2/blob/master/GitHub%20Images/resistor1.jpg)
+![Resistor2](https://github.com/samueldelamotte/intrusion-ai-CANsniffer-v2/blob/master/GitHub%20Images/resistor2.jpg)
 
 3. Attach both Sparkfun CAN-BUS shields to an Arduino Uno. The shield will slot in perfectly with the Arduino Uno's pins.
 
