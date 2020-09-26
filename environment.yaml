@@ -1,4 +1,4 @@
-name: CAN-Monitor2
+name: CAN-Monitor
 channels:
   - anaconda
   - conda-forge
@@ -14,3 +14,4 @@ dependencies:
   - pip:
     - cantools==35.3.0
     - cursor==1.3.4
+    - python-can==3.3.3
