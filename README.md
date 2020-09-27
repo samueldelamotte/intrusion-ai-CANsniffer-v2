@@ -33,29 +33,29 @@ _**NOTE (2):** The Arduino library used for this setup should work with any Ardu
 
 1. Solder pin headers onto both of your Sparkfun CAN-BUS shields.
 
-![Solder](https://github.com/samueldelamotte/intrusion-ai-CANsniffer-v2/blob/master/GitHub%20Images/3.jpg)
+    ![Solder](https://github.com/samueldelamotte/intrusion-ai-CANsniffer-v2/blob/master/GitHub%20Images/3.jpg)
 
 2. On **ONE** of the Sparkfun CAN-BUS shields, solder a single 1000 Ohm resistor (on the underneath) to its CAN-H and CAN-L pins.
 
-![Resistor1](https://github.com/samueldelamotte/intrusion-ai-CANsniffer-v2/blob/master/GitHub%20Images/resistor1.jpg)
-![Resistor2](https://github.com/samueldelamotte/intrusion-ai-CANsniffer-v2/blob/master/GitHub%20Images/resistor2.jpg)
+    ![Resistor1](https://github.com/samueldelamotte/intrusion-ai-CANsniffer-v2/blob/master/GitHub%20Images/resistor1.jpg)
+    ![Resistor2](https://github.com/samueldelamotte/intrusion-ai-CANsniffer-v2/blob/master/GitHub%20Images/resistor2.jpg)
 
 3. Attach both Sparkfun CAN-BUS shields to an Arduino Uno. The shield will slot in perfectly with the Arduino Uno's pins.
 
-![Fit On Arduino](https://github.com/samueldelamotte/intrusion-ai-CANsniffer-v2/blob/master/GitHub%20Images/4.jpg)
+    ![Fit On Arduino](https://github.com/samueldelamotte/intrusion-ai-CANsniffer-v2/blob/master/GitHub%20Images/4.jpg)
 
 4. Put (2x) Arduino Uno + Sparkfun CAN-BUS shield into the 3D printed plastic housing.
 
-![Housing](https://github.com/samueldelamotte/intrusion-ai-CANsniffer-v2/blob/master/GitHub%20Images/housing.jpg)
+    ![Housing](https://github.com/samueldelamotte/intrusion-ai-CANsniffer-v2/blob/master/GitHub%20Images/housing.jpg)
 
 5. Attach jumper cables between both of the Arduino setups using the following instructions;
 
-  - 5V pin to 5V pin
-  - GND pin to GND pin
-  - CAN-H pin to CAN-H pin
-  - CAN-L pin to CAN-L pin
+      - 5V pin to 5V pin
+      - GND pin to GND pin
+      - CAN-H pin to CAN-H pin
+      - CAN-L pin to CAN-L pin
 
-![Jumpers](https://github.com/samueldelamotte/intrusion-ai-CANsniffer-v2/blob/master/GitHub%20Images/jumpers.jpg)
+    ![Jumpers](https://github.com/samueldelamotte/intrusion-ai-CANsniffer-v2/blob/master/GitHub%20Images/jumpers.jpg)
 
 6. Locate your car's OBD2 port, it should be somewhere near the driver or the passenger dash (**Depends on the manufacturer**). Using the DB9 -> OBD2 cable, connect your Arduino setup that includes the 1000 Ohm resistor to the OBD2 port this will be your **RECEIVER** node. The Arduino setup that does not have the 1000 Ohm resistor soldered to it will be your **SENDER** node, thus this will be used to inject intrusion packets onto the CAN bus. After following the instructions in the "1.2 - Software" section just below, you are ready to collect CAN bus data with or without intrusion attacks.
 
@@ -67,12 +67,12 @@ _**NOTE (2):** The Arduino library used for this setup should work with any Ardu
 4. At the top of the script is a "#define" macro for the CAN_BITRATE. You will need to research what bitrate your car's CAN bus uses. I believe in most cases it should be 500 Kbps. *Possible values you can set this to are; 500, 250 or 125. Also note that our USB serial Baud Rate is set to 115200, you won't need to change this.*
 5. Connect your Arduino Uno to your computer's USB port using the Type A -> Type B USB cable, the Arduino IDE should recognise your device upon doing this. To check, go to Tools -> Port -> Select Port. Ensure that it also states "Board: Arduino Uno".
 
-![Arduino COM Port](https://github.com/samueldelamotte/intrusion-ai-CANsniffer-v2/blob/master/GitHub%20Images/1.PNG)
+    ![Arduino COM Port](https://github.com/samueldelamotte/intrusion-ai-CANsniffer-v2/blob/master/GitHub%20Images/1.PNG)
 
 6. Finally, in the top left of the Arduino IDE, click "upload" and the CAN-Reader code will be flashed to your Arduino Receiver node.
 7. Repeat the above steps to install any of the included intrusion attacks (located in the "Intrusions" directory of this GitHub) for the Arduino **SENDER** node. Please refer to the in-code comments for the chosen intrusion attack to setup the attack before flashing it to your sender node.
 
-![Serial Monitor](https://github.com/samueldelamotte/intrusion-ai-CANsniffer-v2/blob/master/GitHub%20Images/2.PNG)
+    ![Serial Monitor](https://github.com/samueldelamotte/intrusion-ai-CANsniffer-v2/blob/master/GitHub%20Images/2.PNG)
 
 8. When the Arduino Receiver node is connected to your car's OBD2 port via the DB9 -> OBD2 cable, connect the Arduino to your laptop to verify that the CAN_BITRATE was set correctly and everything initialised correctly, and that the CAN bus data can be read. The Arduino IDE serial monitor will output, line by line, each CAN bus signal read.
 9. To begin sniffing data, simply click the joystick on the Sparkfun CAN-BUS Shield attached to the Arduino Receiver node. The Arduino script will begin reading CAN bus traffic after a 3 second countdown. To stop reading data, simply click the joystick again. At this point you will then need to follow the next section to in this GitHub to integrate my "CAN-Monitor.py" python script so we can log and analyse CAN bus data that is sniffed via the Arduino setup.
@@ -80,7 +80,7 @@ _**NOTE (2):** The Arduino library used for this setup should work with any Ardu
 
 ### Part 2 - Python CAN-Monitor / Sniffer Tool (CAN-Monitor&#46;py)
 
-This tool is an improvement on the previous python tool used in (https://github.com/samueldelamotte/intrusion-ai-CANsniffer).
+This tool is an improvement on the previous python tool used in (<https://github.com/samueldelamotte/intrusion-ai-CANsniffer>).
 
 #### 2.1 - Important Information
 
@@ -91,34 +91,34 @@ This tool is an improvement on the previous python tool used in (https://github.
 1. Download either Anaconda or Miniconda from the link above. Install by following the instructions applicable.
 2. Using terminal, 'cd' into the root directory of this GitHub.
 
-  ```terminal
-    cd ~/intrusion-ai-CANsniffer-v2
-  ```
+    ```terminal
+      cd ~/intrusion-ai-CANsniffer-v2
+    ```
 
 3. On your Linux / MacOS laptop, simply open a new terminal window. Now create a new Conda environment with the included "environment.yaml" file in this GitHub directory by entering the following code;
 
-  ```terminal
-    conda env create --file environment.yaml
-  ```
+    ```terminal
+      conda env create --file environment.yaml
+    ```
 
 4. The environment and all the necessary packages will be installed by conda under the environment name "CAN-Monitor". After this process is complete, we can activate our environment with the following terminal command;
 
-  ```terminal
-    conda activate CAN-Monitor
-  ```
+    ```terminal
+      conda activate CAN-Monitor
+    ```
 
 5. To launch the python script you will need to know the name of the USB port connection and your code will look like something along the lines of either of the following snippets;
 
-  ```terminal
-    python CAN-Monitor.py /dev/tty.usbmodem1234
-  ```
+    ```terminal
+      python CAN-Monitor.py /dev/tty.usbmodem1234
+    ```
 
-  ```terminal
-    python CAN-Monitor.py /dev/tty.usbbluetooth1234
-  ```
+    ```terminal
+      python CAN-Monitor.py /dev/tty.usbbluetooth1234
+    ```
 
-- **NOTE:** You can type 'ls /dev/tty*' into a terminal window and you'll be able to see all the open serial port connections.
-- **NOTE:** Additionally, the Arduino IDE will be able to also tell you the USB port name.
+    - **NOTE:** You can type 'ls /dev/tty*' into a terminal window and you'll be able to see all the open serial port connections.
+    - **NOTE:** Additionally, the Arduino IDE will be able to also tell you the USB port name.
 
 6. Hopefully the tool will load up and it will be ready to read and display CAN bus data that is read in by the Arduino setup, where it is then sent to your computers USB serial port and then displayed in a way that helps you analyse the data easier. As long as the tool is reading in the CAN bus data, it will also save each message in a .csv file within the same directory.
 
@@ -149,17 +149,17 @@ After completetion of part 1 and part 2 above, you can now read, analyse and col
 1. Download your car's appropriate .dbc file (you NEED this to decode the CAN bus data without having to reverse engineer the payloads).
 2. Organise your Dataset directory so that it is structured properly:
 
-- Passive logs are kept in the "~/intrusion-ai-CANsniffer-v2/Dataset/Passive" sub-directory
-- Aggressive logs are kept in the "~/intrusion-ai-CANsniffer-v2/Dataset/Aggressive" sub-directory
+    - Passive logs are kept in the "~/intrusion-ai-CANsniffer-v2/Dataset/Passive" sub-directory
+    - Aggressive logs are kept in the "~/intrusion-ai-CANsniffer-v2/Dataset/Aggressive" sub-directory
 
 3. Using terminal (ensure your conda "CAN-Monitor" environment is active),
 
-  ```terminal
-    python CAN-Decoder.py "Dbc/hyundai_i30_2014.dbc"
-  ```
+    ```terminal
+      python CAN-Decoder.py "Dbc/hyundai_i30_2014.dbc"
+    ```
 
-- **NOTE:** The first argument to the python script is the location of the .dbc for your car data.
-- **NOTE:** This python script will decoded the entirety of your dataset, thus if you require decoding specific log files one-at-a-time, then you will need to alter the code.
+    - **NOTE:** The first argument to the python script is the location of the .dbc for your car data.
+    - **NOTE:** This python script will decoded the entirety of your dataset, thus if you require decoding specific log files one-at-a-time, then you will need to alter the code.
 
 4. The decoded messages will be saved to the "~/intrusion-ai-CANsniffer-v2/Decodings/{Aggresive or Passive}/{log file name}.csv".
 5. Decoded message Vs. time line plots will be constructed for each message and will be placed in the "~/intrusion-ai-CANsniffer-v2/Plots" directory.
