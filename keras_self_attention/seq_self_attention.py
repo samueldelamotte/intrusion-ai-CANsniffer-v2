@@ -25,7 +25,9 @@ class SeqSelfAttention(keras.layers.Layer):
                  attention_regularizer_weight=0.0,
                  **kwargs):
         """Layer initialization.
+
         For additive attention, see: https://arxiv.org/pdf/1806.01264.pdf
+
         :param units: The dimension of the vectors that used to calculate the attention weights.
         :param attention_width: The width of local attention.
         :param attention_type: 'additive' or 'multiplicative'.
