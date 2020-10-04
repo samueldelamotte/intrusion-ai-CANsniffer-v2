@@ -21,9 +21,37 @@
   <component name="ChangeListManager">
     <list default="true" id="27dc6321-9be3-4bb8-b18b-0c3ffa124e2b" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Attention_Layers.py" beforeDir="false" afterPath="$PROJECT_DIR$/Attention_Layers.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/DeepConvLSTM_Self_Attention.py" beforeDir="false" afterPath="$PROJECT_DIR$/DeepConvLSTM_Self_Attention.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DeepConvLSTM_Self_Attention/DeepConvLSTM_Self_Attention.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/DeepConvLSTM_Self_Attention/DeepConvLSTM_Self_Attention.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DeepConvLSTM_Self_Attention/.ipynb_checkpoints/DeepConvLSTM_Self_Attention-checkpoint.ipynb" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DeepConvLSTM_Self_Attention/.vscode/settings.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DeepConvLSTM_Self_Attention/Attention_Layers.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DeepConvLSTM_Self_Attention/Dataset/Aggressive/log-(23-08-2020_12-59-01).csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DeepConvLSTM_Self_Attention/Dataset/Aggressive/log-(23-08-2020_13-26-05).csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DeepConvLSTM_Self_Attention/Dataset/Aggressive/log-(29-07-2020_14-09-34).csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DeepConvLSTM_Self_Attention/Dataset/Aggressive/log-(31-07-2020_12-27-26).csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DeepConvLSTM_Self_Attention/Dataset/Aggressive/log-(31-07-2020_12-55-39).csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DeepConvLSTM_Self_Attention/Dataset/LOTO/Saved_Models/best_model_with_self_attn_WISDM_fold_0.h5" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DeepConvLSTM_Self_Attention/Dataset/LOTO/Saved_Models/best_model_with_self_attn_WISDM_fold_1.h5" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DeepConvLSTM_Self_Attention/Dataset/LOTO/Saved_Models/best_model_with_self_attn_WISDM_fold_2.h5" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DeepConvLSTM_Self_Attention/Dataset/LOTO/Saved_Models/best_model_with_self_attn_WISDM_fold_3.h5" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DeepConvLSTM_Self_Attention/Dataset/LOTO/Saved_Models/best_model_with_self_attn_WISDM_fold_4.h5" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DeepConvLSTM_Self_Attention/Dataset/LOTO/Saved_Models/best_model_with_self_attn_WISDM_fold_5.h5" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DeepConvLSTM_Self_Attention/Dataset/LOTO/Saved_Models/best_model_with_self_attn_WISDM_fold_6.h5" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DeepConvLSTM_Self_Attention/Dataset/LOTO/Saved_Models/best_model_with_self_attn_WISDM_fold_7.h5" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DeepConvLSTM_Self_Attention/Dataset/LOTO/Saved_Models/best_model_with_self_attn_WISDM_fold_8.h5" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DeepConvLSTM_Self_Attention/Dataset/LOTO/Saved_Models/best_model_with_self_attn_WISDM_fold_9.h5" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DeepConvLSTM_Self_Attention/Dataset/LOTO/Saved_Models/results_model_with_self_attn_LOTO.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DeepConvLSTM_Self_Attention/Dataset/LOTO/WISDM.npz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DeepConvLSTM_Self_Attention/Dataset/Passive/log-(16-07-2020_11-29-59).csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DeepConvLSTM_Self_Attention/Dataset/Passive/log-(16-07-2020_12-12-08).csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DeepConvLSTM_Self_Attention/Dataset/Passive/log-(29-07-2020_11-46-07).csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DeepConvLSTM_Self_Attention/Dataset/Passive/log-(29-07-2020_12-55-54).csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DeepConvLSTM_Self_Attention/Dataset/Passive/log-(30-05-2020_15-57-52).csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DeepConvLSTM_Self_Attention/DeepConvLSTM_Self_Attention.ipynb" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DeepConvLSTM_Self_Attention/DeepConvLSTM_Self_Attention.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/keras_self_attention/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/keras_self_attention/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/keras_self_attention/scaled_dot_attention.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/keras_self_attention/seq_weighted_attention.py" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -33,7 +61,7 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="JupyterTrust" id="41c9bf88-7280-4985-9fbf-38cd56b40f5c" />
+  <component name="JupyterTrust" id="39ae0680-b198-494d-ba7b-3f329cf8ac76" />
   <component name="ProjectId" id="1iJpbzpe9Ngw0DN0TEVqEbNfjqB" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -43,6 +71,7 @@
     <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
   <component name="RunManager" selected="Python.DeepConvLSTM_Self_Attention">
@@ -112,6 +141,7 @@
       <workItem from="1601700991348" duration="22001000" />
       <workItem from="1601725622035" duration="957000" />
       <workItem from="1601726697899" duration="4826000" />
+      <workItem from="1601789175137" duration="4876000" />
     </task>
     <servers />
   </component>
@@ -143,21 +173,25 @@
       <screen x="0" y="26" width="2560" height="1378" />
     </state>
     <state x="100" y="126" width="2360" height="1178" key="DiffContextDialog/0.26.2560.1378/2560.360.1920.1080@0.26.2560.1378" timestamp="1601712891586" />
-    <state width="1196" height="1218" key="GridCell.Tab.0.bottom" timestamp="1601743126244">
-      <screen x="0" y="26" width="2560" height="1378" />
+    <state width="1638" height="806" key="GridCell.Tab.0.bottom" timestamp="1601800874797">
+      <screen x="0" y="23" width="1680" height="985" />
     </state>
+    <state width="1638" height="806" key="GridCell.Tab.0.bottom/0.23.1680.985@0.23.1680.985" timestamp="1601800874797" />
     <state width="1196" height="1218" key="GridCell.Tab.0.bottom/0.26.2560.1378/2560.360.1920.1080@0.26.2560.1378" timestamp="1601743126244" />
-    <state width="1196" height="1218" key="GridCell.Tab.0.center" timestamp="1601743126244">
-      <screen x="0" y="26" width="2560" height="1378" />
+    <state width="1638" height="806" key="GridCell.Tab.0.center" timestamp="1601800874796">
+      <screen x="0" y="23" width="1680" height="985" />
     </state>
+    <state width="1638" height="806" key="GridCell.Tab.0.center/0.23.1680.985@0.23.1680.985" timestamp="1601800874796" />
     <state width="1196" height="1218" key="GridCell.Tab.0.center/0.26.2560.1378/2560.360.1920.1080@0.26.2560.1378" timestamp="1601743126244" />
-    <state width="1196" height="1218" key="GridCell.Tab.0.left" timestamp="1601743126244">
-      <screen x="0" y="26" width="2560" height="1378" />
+    <state width="1638" height="806" key="GridCell.Tab.0.left" timestamp="1601800874795">
+      <screen x="0" y="23" width="1680" height="985" />
     </state>
+    <state width="1638" height="806" key="GridCell.Tab.0.left/0.23.1680.985@0.23.1680.985" timestamp="1601800874795" />
     <state width="1196" height="1218" key="GridCell.Tab.0.left/0.26.2560.1378/2560.360.1920.1080@0.26.2560.1378" timestamp="1601743126244" />
-    <state width="1196" height="1218" key="GridCell.Tab.0.right" timestamp="1601743126244">
-      <screen x="0" y="26" width="2560" height="1378" />
+    <state width="1638" height="806" key="GridCell.Tab.0.right" timestamp="1601800874796">
+      <screen x="0" y="23" width="1680" height="985" />
     </state>
+    <state width="1638" height="806" key="GridCell.Tab.0.right/0.23.1680.985@0.23.1680.985" timestamp="1601800874796" />
     <state width="1196" height="1218" key="GridCell.Tab.0.right/0.26.2560.1378/2560.360.1920.1080@0.26.2560.1378" timestamp="1601743126244" />
     <state width="2514" height="294" key="GridCell.Tab.1.bottom" timestamp="1601725608908">
       <screen x="0" y="26" width="2560" height="1378" />
@@ -182,6 +216,6 @@
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/intrusion_ai_CANsniffer_v2$Pre_Process_Dataset.coverage" NAME="Pre_Process_Dataset Coverage Results" MODIFIED="1601638567552" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/intrusion_ai_CANsniffer_v2$DeepConvLSTM_Self_Attention.coverage" NAME="DeepConvLSTM_Self_Attention Coverage Results" MODIFIED="1601730822842" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/intrusion_ai_CANsniffer_v2$DeepConvLSTM_Self_Attention.coverage" NAME="DeepConvLSTM_Self_Attention Coverage Results" MODIFIED="1601793213852" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>
