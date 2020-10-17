@@ -2,6 +2,12 @@
 
 ![Demo](https://github.com/samueldelamotte/intrusion-ai-CANsniffer-v2/blob/master/GitHub%20Images/demo.gif)
 
+- passive_actual_windows: 1567.615
+- passive_pred_windows: 1563.17
+
+- aggressive_actual_windows: 1631.55
+- aggressive_pred_windows: 1641.94
+
 ## Hardware Requirements
 
 _**NOTE (1):** As the Sparkfun CAN-BUS Shield does not come with pre-soldered pin headers, you must solder these to the board yourself. Thus, you will need a soldering iron and solder to do this._
