@@ -11,7 +11,9 @@ from tensorflow.keras.models import Model
 from tensorflow.keras.layers import Dense, LSTM, Conv1D, Input
 from tensorflow import keras
 from tensorflow.keras import backend as K
-
+from sklearn.metrics import f1_score, precision_score, recall_score, confusion_matrix, classification_report
+import cantools
+import sys
 
 # Sliding window length that segments the data
 SLIDING_WINDOW_LENGTH = 60
@@ -26,13 +28,13 @@ NUM_FILTERS = 64
 FILTER_SIZE = 1
 
 # Number of unit in the long short-term recurrent layers
-NUM_UNITS_LSTM = 120
+NUM_UNITS_LSTM = 256
 
 # Number of units in the self attention mechanism
 ATTENTION_UNITS = 60
 
 # The local width of the attention mechanism
-ATTENTION_WIDTH = 10
+ATTENTION_WIDTH = 60
 
 # Number of epochs to train our model
 EPOCHS = 20
@@ -57,6 +59,7 @@ MODEL_SAVE_DIR = os.path.join('Saved_Models')
 class SeqSelfAttention(keras.layers.Layer):
     ATTENTION_TYPE_ADD = 'additive'
     ATTENTION_TYPE_MUL = 'multiplicative'
+
     def __init__(self,
                  units=32,
                  attention_width=None,
@@ -295,7 +298,8 @@ def deep_conv_lstm_self_attention():
     """
     # Input shape is num of time steps * features
     input_layer = Input(shape=(SLIDING_WINDOW_LENGTH, 10), batch_size=BATCH_SIZE)
-    conv = Conv1D(NUM_FILTERS, FILTER_SIZE, padding='same', activation='relu', input_shape=(SLIDING_WINDOW_LENGTH, 10))(input_layer)
+    conv = Conv1D(NUM_FILTERS, FILTER_SIZE, padding='same', activation='relu', input_shape=(SLIDING_WINDOW_LENGTH, 10))(
+        input_layer)
     conv2 = Conv1D(NUM_FILTERS, FILTER_SIZE, padding='same', activation='relu')(conv)
     conv3 = Conv1D(NUM_FILTERS, FILTER_SIZE, padding='same', activation='relu')(conv2)
     lstm = LSTM(NUM_UNITS_LSTM, dropout=0.3, activation='tanh', return_sequences=True)(conv3)
@@ -330,9 +334,55 @@ def sliding_window(data, length, step=1):
     :return: NumPy array that contains the windowed dataset.
     """
     streams = it.tee(data, length)
-    a = zip(*[it.islice(stream, i, None, step*length) for stream, i in zip(streams, it.count(step=step))])
+    a = zip(*[it.islice(stream, i, None, step * length) for stream, i in zip(streams, it.count(step=step))])
     b = list(a)
     return np.asarray(b)
+
+
+def recall_m(y_true, y_pred):
+    true_positives = K.sum(K.round(K.clip(y_true * y_pred, 0, 1)))
+    possible_positives = K.sum(K.round(K.clip(y_true, 0, 1)))
+    recall = true_positives / (possible_positives + K.epsilon())
+    return recall
+
+
+def precision_m(y_true, y_pred):
+    true_positives = K.sum(K.round(K.clip(y_true * y_pred, 0, 1)))
+    predicted_positives = K.sum(K.round(K.clip(y_pred, 0, 1)))
+    precision = true_positives / (predicted_positives + K.epsilon())
+    return precision
+
+
+def f1_m(y_true, y_pred):
+    precision = precision_m(y_true, y_pred)
+    recall = recall_m(y_true, y_pred)
+    return 2 * ((precision * recall) / (precision + recall + K.epsilon()))
+
+
+def write_decoded_mesage_to_file(db, frame, drivingStyle):
+    hexPayload = ''
+    for byte in frame.hex_data:
+        if byte == -1:
+            byte = 0
+        hexPayload += '{:02x}'.format(byte)
+    hexPayloadBytes = bytearray.fromhex(hexPayload)
+    try:
+        decodedFrame = db.decode_message(frame.id_dec, hexPayloadBytes)
+        for key, value in decodedFrame.items():
+            stringToWrite = key + "," + str(value) + "\n"
+            m = open("{0}windows.csv".format(drivingStyle), "a")
+            m.write(stringToWrite)
+            m.close
+    except:
+        pass
+
+
+class Frame:
+    def __init__(self, data):
+        self.frame = data
+        self.id_dec = int(self.frame[0])
+        self.len = int(self.frame[1])
+        self.hex_data = self.frame[2:(self.len+2)]
 
 
 if __name__ == '__main__':
@@ -359,7 +409,7 @@ if __name__ == '__main__':
     else:
         print('No saved passive dataset, reading in and processing new data.')
         passive = np.genfromtxt(PASSIVE_DATA_PATH, delimiter=',', skip_header=1, dtype=int)
-        np.save(NPY_PASSIVE_DATA_PATH, passive)
+        np.save(NPY_PASSIVE_DATA_PATH, passive.astype(float))
 
     # Check if aggressive numpy saves exist, if so load .npy, else read in .csv
     if os.path.exists(os.path.join(NPY_AGGRESSIVE_DATA_PATH)):
@@ -368,7 +418,7 @@ if __name__ == '__main__':
     else:
         print('No saved aggressive dataset, reading in and processing new data.')
         aggressive = np.genfromtxt(AGGRESSIVE_DATA_PATH, delimiter=',', skip_header=1, dtype=int)
-        np.save(NPY_AGGRESSIVE_DATA_PATH, aggressive)
+        np.save(NPY_AGGRESSIVE_DATA_PATH, aggressive.astype(float))
 
     # Extract labels
     passive_labels = passive[:, -1]
@@ -389,7 +439,8 @@ if __name__ == '__main__':
     X_train, X_test, y_train, y_test = train_test_split(X_, y_, test_size=0.2, random_state=SEED)
 
     # Prompt the user to supply 'y' or 'n' to retrain model
-    retrainCheck = input('Do you want to train a new model (y/n)? ')
+    retrainCheck = input('Do you want to train a new model, type \'y\' or \'n\'.\nOr type \'decode\' to predict with '
+                         'the saved model and then decode into human readable signals.\n')
     if retrainCheck == 'y':
         # Initialise our DeepConvLSTM with Self-Attention Mechanism model
         model = deep_conv_lstm_self_attention()
@@ -398,7 +449,7 @@ if __name__ == '__main__':
         lrs = LearningRateScheduler(learning_scheduler)
 
         # Sets our callback for the early stopper
-        es = EarlyStopping(monitor='loss', min_delta=0.005, patience=1, verbose=0, mode='min',
+        es = EarlyStopping(monitor='loss', min_delta=0.005, patience=3, verbose=0, mode='min',
                            restore_best_weights=False, baseline=None)
 
         # Print the shapes and number of training instances and testing instances
@@ -413,34 +464,48 @@ if __name__ == '__main__':
 
         # Fit the model to the training data
         optimizer = tf.keras.optimizers.Adam()
-        model.compile(optimizer=optimizer, loss='binary_crossentropy', metrics=['accuracy'])
+        model.compile(optimizer=optimizer, loss='binary_crossentropy', metrics=['acc', f1_m, precision_m, recall_m])
         model.fit(X_train, y_train, epochs=EPOCHS, batch_size=BATCH_SIZE, validation_split=0.05, callbacks=[lrs, es])
 
         # Evaluate the model
-        y_pred_score = model.evaluate(X_test, y_test, batch_size=BATCH_SIZE, verbose=0)
+        loss, accuracy, f1_score, precision, recall = model.evaluate(X_test, y_test, batch_size=BATCH_SIZE, verbose=0)
 
         # Let's take a look at our model's loss and accuracy score
-        print("DeepConvLSTM-Self-Attention accuracy: ", y_pred_score[1])
-        print("DeepConvLSTM-Self-Attention loss: ", y_pred_score[0])
+        print("[NEW] DeepConvLSTM-Self-Attention accuracy: ", accuracy)
+        print("[NEW] DeepConvLSTM-Self-Attention loss: ", loss)
+        print("[NEW] DeepConvLSTM-Self-Attention precision: ", precision)
+        print("[NEW] DeepConvLSTM-Self-Attention recall: ", recall)
+        print("[NEW] DeepConvLSTM-Self-Attention f1_score: ", f1_score)
 
         # Check to see if we have a previous best model saved
         if os.path.exists(os.path.join(MODEL_SAVE_DIR, 'best_model.h5')):
             # Load our previous best model
-            savedModel = load_model(os.path.join(MODEL_SAVE_DIR, 'best_model.h5'),
-                                    custom_objects={'SeqSelfAttention': SeqSelfAttention})
+            oldModel = load_model(os.path.join(MODEL_SAVE_DIR, 'best_model.h5'),
+                                  custom_objects={'SeqSelfAttention': SeqSelfAttention, 'f1_m': f1_m,
+                                                  'precision_m': precision_m, 'recall_m': recall_m})
 
             # Evaluate our old model
             try:
-                savedModelScore = savedModel.evaluate(X_test, y_test, batch_size=BATCH_SIZE, verbose=0)
+                oldLoss, oldAccuracy, oldF1_score, oldPrecision, oldRecall = oldModel.evaluate(X_test, y_test,
+                                                                                               batch_size=BATCH_SIZE,
+                                                                                               verbose=0)
+                # If it is better (based on accuracy), then we should overwrite our previous best model
+                if f1_score > oldF1_score:
+                    # Save the model diagram and its diagram
+                    model.save(os.path.join(MODEL_SAVE_DIR, 'best_model.h5'))
+                    tf.keras.utils.plot_model(model, os.path.join(MODEL_SAVE_DIR, 'best_model.png'))
+                    print('New best model saved!')
+                    print('Saved models metrics were:')
+                    print("[OLD] DeepConvLSTM-Self-Attention accuracy: ", oldAccuracy)
+                    print("[OLD] DeepConvLSTM-Self-Attention loss: ", oldLoss)
+                    print("[OLD] DeepConvLSTM-Self-Attention precision: ", oldPrecision)
+                    print("[OLD] DeepConvLSTM-Self-Attention recall: ", oldRecall)
+                    print("[OLD] DeepConvLSTM-Self-Attention f1_score: ", oldF1_score)
             except:
-                print('The previously saved model expects different sliding window lengths.')
+                print('The previously saved model is incompatible with the new models sliding window length.')
                 print('Please remove saved model if you wish to train on a different sliding window length.')
                 quit()
 
-            # If it is better (based on accuracy), then we should overwrite our previous best model
-            if y_pred_score[1] > savedModelScore[1]:
-                model.save(os.path.join(MODEL_SAVE_DIR, 'best_model.h5'))
-                print('New best model saved!')
         # If no previous best model, then save this new model as our best
         else:
             model.save(os.path.join(MODEL_SAVE_DIR, 'best_model.h5'))
@@ -450,15 +515,217 @@ if __name__ == '__main__':
         if os.path.exists(os.path.join(MODEL_SAVE_DIR, 'best_model.h5')):
             # Load in our saved model, custom_objects must be defined to load it correctly
             model = load_model(os.path.join(MODEL_SAVE_DIR, 'best_model.h5'),
-                               custom_objects={'SeqSelfAttention': SeqSelfAttention})
+                               custom_objects={'SeqSelfAttention': SeqSelfAttention, 'f1_m': f1_m,
+                                               'precision_m': precision_m, 'recall_m': recall_m})
             print(model.summary())
 
             # Evaluate the model
-            y_pred_score = model.evaluate(X_test, y_test, batch_size=BATCH_SIZE, verbose=0)
+            loss, accuracy, f1_score, precision, recall = model.evaluate(X_test, y_test, batch_size=BATCH_SIZE,
+                                                                         verbose=0)
 
             # Let's take a look at our model's loss and accuracy score
-            print("DeepConvLSTM-Self-Attention accuracy: ", y_pred_score[1])
-            print("DeepConvLSTM-Self-Attention loss: ", y_pred_score[0])
+            print("DeepConvLSTM-Self-Attention accuracy: ", accuracy)
+            print("DeepConvLSTM-Self-Attention loss: ", loss)
+            print("DeepConvLSTM-Self-Attention precision: ", precision)
+            print("DeepConvLSTM-Self-Attention recall: ", recall)
+            print("DeepConvLSTM-Self-Attention f1_score: ", f1_score)
+
+            # Save the model diagram
+            tf.keras.utils.plot_model(model, os.path.join(MODEL_SAVE_DIR, 'best_model.png'))
+
+        # Prompt user that there is no previously saved model.
+        else:
+            print('No previous model has been saved. Please train a new model.')
+
+    elif retrainCheck == 'decode':
+        # Check to see if we have a previous best model saved
+        if os.path.exists(os.path.join(MODEL_SAVE_DIR, 'best_model.h5')):
+            # Load in our saved model, custom_objects must be defined to load it correctly
+            model = load_model(os.path.join(MODEL_SAVE_DIR, 'best_model.h5'),
+                               custom_objects={'SeqSelfAttention': SeqSelfAttention, 'f1_m': f1_m,
+                                               'precision_m': precision_m, 'recall_m': recall_m})
+            print(model.summary())
+
+            # Predict on our X_test
+            y_preds = model.predict(X_test, verbose=0, batch_size=BATCH_SIZE)
+
+            # Transform our predictions. The model predicts on each frame it sees during a sliding window,
+            # it is a binary classification so the value of prediction for each frame within a window is a
+            # probability value that identifies the positive instance.
+            # Thus, if a prediction is 0.345678 => the model is predicting that it is more passive as opposed to
+            # the frame being aggressive. Another example, if the prediction was 0.76543 => the model is predicting
+            # more that the frame is aggressive. Firstly, we need to round the probabilities so,
+            # <=0.5 = passive and >0.5 = aggressive
+            y_preds_round = np.asarray(np.round(y_preds)).reshape(np.round(y_preds).shape[0], SLIDING_WINDOW_LENGTH)
+            y_test_np = np.asarray(y_test)
+
+            # Then we flatten our ground truths and our model's predictions so we can loop through and compare each
+            # frame's ground truth and the model's predicted label.
+            y_test_flat = y_test_np.flatten()
+            y_preds_flat = y_preds_round.flatten()
+
+            # We also transform our X_test set values back from float32 to int as that is how the can bus data is
+            X_test = np.asarray(X_test, int)
+
+            # Now we will loop through our flattened ground truth labels for our test set, and then perform some logic
+            # to identifiy which sliding window each sequential frame belongs to and if it is a passive or
+            # aggressive frame
+            passiveWindows = []
+            aggressiveWindows = []
+            previousWindowIndex = 0
+            totalPassiveFrames = 0.0
+            totalAggressiveFrames = 0.0
+            sumForWindow = 0
+            sum = 0
+            for index, element in enumerate(y_test_flat):
+                if element == 0.:
+                    totalPassiveFrames += 1.0
+                    # If the frame is passive and lies within the same sliding window, then don't increase sum value
+                    if int(index / SLIDING_WINDOW_LENGTH) == previousWindowIndex:
+                        continue
+                    # Otherwise, we know that the frame lies within the next sliding window
+                    else:
+                        sumForWindow = sum
+                        sum = 0
+                        # If the number of aggressive frames in the window are > half of the sliding window length
+                        # Then we say that the window is overall, aggressive
+                        if sumForWindow > int(SLIDING_WINDOW_LENGTH / 2):
+                            aggressiveWindows.append(X_test[previousWindowIndex])
+                            previousWindowIndex = int(index / SLIDING_WINDOW_LENGTH)     # Set new window index value
+                        # Otherwise, we have determined that the window is overall, passive
+                        else:
+                            passiveWindows.append(X_test[int(index / SLIDING_WINDOW_LENGTH)])
+                            previousWindowIndex = int(index / SLIDING_WINDOW_LENGTH)     # Set new window index value
+                # If the frame is aggressive and lies within the same sliding window, then we must increase sum value
+                elif element == 1.:
+                    totalAggressiveFrames += 1.0
+                    if int(index / SLIDING_WINDOW_LENGTH) == previousWindowIndex:
+                        sum += 1
+                        continue
+                    # Otherwise, we know that the frame lies within the next sliding window
+                    else:
+                        sumForWindow = sum + 1
+                        sum = 0
+                        # If the number of aggressive frames in the window are > half of the sliding window length
+                        # Then we say that the model has predicted that the window is overall, aggressive
+                        if sumForWindow > int(SLIDING_WINDOW_LENGTH / 2):
+                            aggressiveWindows.append(X_test[previousWindowIndex])
+                            previousWindowIndex = int(index / SLIDING_WINDOW_LENGTH)     # Set new window index value
+                        # Otherwise, we have determined that the window is overall, passive
+                        else:
+                            passiveWindows.append(X_test[int(index / SLIDING_WINDOW_LENGTH)])
+                            previousWindowIndex = int(index / SLIDING_WINDOW_LENGTH)     # Set new window index value
+
+            print("ACTUAL # of passive windows:", len(passiveWindows), "\nACTUAL # of aggressive windows:",
+                  len(aggressiveWindows))
+            print("ACTUAL # of total passive frames:", int(totalPassiveFrames), "\nACTUAL # of total aggressive frames:",
+                  int(totalAggressiveFrames), "\n")
+
+            """
+                Uncomment below to decode and write to file, the actual passive and actual aggressive
+                decoded sliding windows, from our test set (X_test)
+            """
+            # First we try to read in our .DBC file that will be used to convert the can bus data into readable form
+            try:
+                db = cantools.database.load_file('Dbc/hyundai_i30_2014.dbc')
+            except:
+                print("Could not load .dbc file at '{0}'".format(sys.argv[1]))
+                quit()
+
+            # Loop through each of the actual passive and aggresive windows and decode the signals to files
+            print("Starting to decode actual passive windows...")
+            for _, data in enumerate(passiveWindows):
+                for _, frame in enumerate(data):
+                    newFrame = Frame(frame)
+                    write_decoded_mesage_to_file(db, newFrame, 'passive_actual_')
+            print("Done! File has been saved as 'passive_actual_windows.csv'")
+            print("Starting to decode actual aggressive windows...")
+            for _, data in enumerate(aggressiveWindows):
+                for _, frame in enumerate(data):
+                    newFrame = Frame(frame)
+                    write_decoded_mesage_to_file(db, newFrame, 'aggressive_actual_')
+            print("Done! File has been saved as 'aggressive_actual_windows.csv'")
+
+            # Now we will loop through our flattened model prediction labels for our test set, and then perform some
+            # logic to identifiy which sliding window each sequential frame belongs to and if it is a passive or
+            # aggressive frame
+            passiveWindows = []
+            aggressiveWindows = []
+            previousWindowIndex = 0
+            totalPassiveFrames = 0.0
+            totalAggressiveFrames = 0.0
+            sumForWindow = 0
+            sum = 0
+            for index, element in enumerate(y_preds_flat):
+                if element == 0.:
+                    totalPassiveFrames += 1.0
+                    # If the frame is passive and lies within the same sliding window, then don't increase sum value
+                    if int(index / SLIDING_WINDOW_LENGTH) == previousWindowIndex:
+                        continue
+                    # Otherwise, we know that the frame lies within the next sliding window
+                    else:
+                        sumForWindow = sum
+                        sum = 1
+                        # If the number of aggressive frames in the window are > half of the sliding window length
+                        # Then we say that the window is overall, aggressive
+                        if sumForWindow > int(SLIDING_WINDOW_LENGTH / 2):
+                            aggressiveWindows.append(X_test[previousWindowIndex])
+                            previousWindowIndex = int(index / SLIDING_WINDOW_LENGTH)  # Set new window index value
+                        # Otherwise, we have determined that the window is overall, passive
+                        else:
+                            passiveWindows.append(X_test[int(index / SLIDING_WINDOW_LENGTH)])
+                            previousWindowIndex = int(index / SLIDING_WINDOW_LENGTH)  # Set new window index value
+                # If the frame is aggressive and lies within the same sliding window, then we must increase sum value
+                elif element == 1.:
+                    totalAggressiveFrames += 1.0
+                    if int(index / SLIDING_WINDOW_LENGTH) == previousWindowIndex:
+                        sum += 1
+                        continue
+                    # Otherwise, we know that the frame lies within the next sliding window
+                    else:
+                        sumForWindow = sum + 1
+                        sum = 1
+                        # If the number of aggressive frames in the window are > half of the sliding window length
+                        # Then we say that the model has predicted that the window is overall, aggressive
+                        if sumForWindow > int(SLIDING_WINDOW_LENGTH / 2):
+                            aggressiveWindows.append(X_test[previousWindowIndex])
+                            previousWindowIndex = int(index / SLIDING_WINDOW_LENGTH)  # Set new window index value
+                        # Otherwise, we have determined that the window is overall, passive
+                        else:
+                            passiveWindows.append(X_test[int(index / SLIDING_WINDOW_LENGTH)])
+                            previousWindowIndex = int(index / SLIDING_WINDOW_LENGTH)  # Set new window index value
+
+            print("ACTUAL # of passive windows:", len(passiveWindows), "\nACTUAL # of aggressive windows:",
+                  len(aggressiveWindows))
+            print("ACTUAL # of total passive frames:", int(totalPassiveFrames),
+                  "\nACTUAL # of total aggressive frames:",
+                  int(totalAggressiveFrames), "\n")
+
+            """
+                Uncomment below to decode and write to file, the predicted passive and predicted aggressive
+                decoded sliding windows, from our test set (X_test)
+            """
+            # First we try to read in our .DBC file that will be used to convert the can bus data into readable form
+            try:
+                db = cantools.database.load_file('Dbc/hyundai_i30_2014.dbc')
+            except:
+                print("Could not load .dbc file at '{0}'".format(sys.argv[1]))
+                quit()
+
+            # Loop through each of the predicted passive and aggresive windows and decode the signals to files
+            print("Starting to decode predicted passive windows...")
+            for _, data in enumerate(passiveWindows):
+                for _, frame in enumerate(data):
+                    newFrame = Frame(frame)
+                    write_decoded_mesage_to_file(db, newFrame, 'passive_pred_')
+            print("Done! File has been saved as 'passive_pred_windows.csv'")
+            print("Starting to decode predicted aggressive windows...")
+            for _, data in enumerate(aggressiveWindows):
+                for _, frame in enumerate(data):
+                    newFrame = Frame(frame)
+                    write_decoded_mesage_to_file(db, newFrame, 'aggressive_pred_')
+            print("Done! File has been saved as 'aggressive_pred_windows.csv'")
+
         # Prompt user that there is no previously saved model.
         else:
             print('No previous model has been saved. Please train a new model.')
