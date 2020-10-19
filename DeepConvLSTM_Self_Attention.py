@@ -12,7 +12,7 @@ from tensorflow.keras.layers import Dense, LSTM, Conv1D, Input
 from tensorflow import keras
 from tensorflow.keras import backend as K
 from sklearn.metrics import f1_score, precision_score, recall_score, confusion_matrix, classification_report
-import cantools
+# import cantools
 import sys
 
 # Sliding window length that segments the data
@@ -493,7 +493,7 @@ if __name__ == '__main__':
                 if f1_score > oldF1_score:
                     # Save the model diagram and its diagram
                     model.save(os.path.join(MODEL_SAVE_DIR, 'best_model.h5'))
-                    tf.keras.utils.plot_model(model, os.path.join(MODEL_SAVE_DIR, 'best_model.png'))
+                    # tf.keras.utils.plot_model(model, os.path.join(MODEL_SAVE_DIR, 'best_model.png'))
                     print('New best model saved!')
                     print('Saved models metrics were:')
                     print("[OLD] DeepConvLSTM-Self-Attention accuracy: ", oldAccuracy)
@@ -531,7 +531,7 @@ if __name__ == '__main__':
             print("DeepConvLSTM-Self-Attention f1_score: ", f1_score)
 
             # Save the model diagram
-            tf.keras.utils.plot_model(model, os.path.join(MODEL_SAVE_DIR, 'best_model.png'))
+            # tf.keras.utils.plot_model(model, os.path.join(MODEL_SAVE_DIR, 'best_model.png'))
 
         # Prompt user that there is no previously saved model.
         else:
@@ -695,10 +695,10 @@ if __name__ == '__main__':
                             passiveWindows.append(X_test[int(index / SLIDING_WINDOW_LENGTH)])
                             previousWindowIndex = int(index / SLIDING_WINDOW_LENGTH)  # Set new window index value
 
-            print("ACTUAL # of passive windows:", len(passiveWindows), "\nACTUAL # of aggressive windows:",
+            print("PRED # of passive windows:", len(passiveWindows), "\PRED # of aggressive windows:",
                   len(aggressiveWindows))
-            print("ACTUAL # of total passive frames:", int(totalPassiveFrames),
-                  "\nACTUAL # of total aggressive frames:",
+            print("PRED # of total passive frames:", int(totalPassiveFrames),
+                  "\PRED # of total aggressive frames:",
                   int(totalAggressiveFrames), "\n")
 
             """
